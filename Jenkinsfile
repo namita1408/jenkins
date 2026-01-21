@@ -1,24 +1,30 @@
 pipeline {
-agent any
-environment {
-DOCKER = &#39;&quot;C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe&quot;&#39;
-}
-stages {
-stage(&#39;Build Docker Image&#39;) {
-steps {
-bat &#39;%DOCKER% build -t python-app .&#39;
-}
-}
+    agent any
 
-stage(&#39;Run Tests Inside Docker&#39;) {
-steps {
-bat &#39;%DOCKER% run --rm python-app pytest&#39;
-}
-}
-stage(&#39;Run Application&#39;) {
-steps {
-bat &#39;%DOCKER% run --rm python-app&#39;
-}
-}
-}
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/namita1408/jenkins.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t my-python-app .'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                bat 'docker run --rm my-python-app pytest'
+            }
+        }
+
+        stage('Run Application') {
+            steps {
+                bat 'docker run --rm my-python-app python app.py'
+            }
+        }
+    }
 }
